@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect, useCallback } from "react"
-import { Send, Trash2, MessageSquare, X, Clock } from "lucide-react"
+import { useState, useRef, useEffect } from "react"
+import { Send, Trash2, MessageSquare, X, Clock, PanelLeftClose, PanelLeft, Plus } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { ModelSelector } from "./ModelSelector"
@@ -8,25 +8,19 @@ import { LoadingSpinner } from "./LoadingSpinner"
 import { useHistory } from "@/contexts/HistoryContext"
 import type { Message } from "@/contexts/HistoryContext"
 
-interface ChatAreaProps {
-  onNewChat: () => void
-}
-
-export function ChatArea({ onNewChat }: ChatAreaProps) {
+export function ChatArea() {
   const [prompt, setPrompt] = useState("")
-  const [model, setModel] = useState("anthropic/claude-sonnet-4.6")
+  const [model, setModel] = useState("openai/gpt-5.5")
   const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const { conversations, activeId, addConversation, updateConversation, deleteConversation, setActiveId } = useHistory()
+  const { conversations, activeId, addConversation, updateConversation, deleteConversation, setActiveId, clearAll } = useHistory()
 
-  // Auto scroll to bottom
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" })
   }, [messages, loading])
 
-  // Load conversation when activeId changes
   useEffect(() => {
     if (activeId) {
       const conv = conversations.find((c) => c.id === activeId)
@@ -39,12 +33,12 @@ export function ChatArea({ onNewChat }: ChatAreaProps) {
     }
   }, [activeId, conversations])
 
-  const handleNewChat = useCallback(() => {
+  const handleNewChat = () => {
     setMessages([])
     setPrompt("")
     setActiveId(null)
-    onNewChat()
-  }, [setActiveId, onNewChat])
+    setModel("openai/gpt-5.5")
+  }
 
   const handleSend = async () => {
     if (!prompt.trim() || loading) return
@@ -55,7 +49,6 @@ export function ChatArea({ onNewChat }: ChatAreaProps) {
     let currentMessages: Message[]
     let currentId: string
 
-    // If no active conversation, create new one
     if (!activeId) {
       currentId = Math.random().toString(36).substring(2, 9)
       currentMessages = [{ role: "user", content: userMsg }]
@@ -136,18 +129,7 @@ export function ChatArea({ onNewChat }: ChatAreaProps) {
               onClick={() => setSidebarOpen(false)}
               className="lg:hidden flex h-8 w-8 items-center justify-center rounded-lg border-[2px] border-neo-black dark:border-white/30"
             >
-              <X className="h-4 w-4" />
-            </button>
-          </div>
-
-          {/* New Chat Button in Sidebar */}
-          <div className="p-3">
-            <button
-              onClick={handleNewChat}
-              className="flex w-full items-center gap-2 rounded-xl border-[3px] border-neo-black bg-neo-yellow px-4 py-3 text-sm font-black shadow-neo transition-all hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] dark:bg-neo-purple dark:border-white/30 dark:shadow-neo-purple"
-            >
-              <MessageSquare className="h-4 w-4" />
-              New Chat
+              <PanelLeftClose className="h-4 w-4" />
             </button>
           </div>
 
@@ -194,6 +176,19 @@ export function ChatArea({ onNewChat }: ChatAreaProps) {
               ))}
             </div>
           </div>
+
+          {/* Clear All at bottom */}
+          {conversations.length > 0 && (
+            <div className="border-t-[3px] border-neo-black p-3 dark:border-white/20">
+              <button
+                onClick={clearAll}
+                className="flex w-full items-center justify-center gap-2 rounded-xl border-[3px] border-neo-black bg-white px-4 py-2 text-xs font-black shadow-neo transition-all hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] dark:bg-neo-dark-card dark:border-white/30 dark:shadow-neo-purple"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Clear All
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
@@ -207,14 +202,27 @@ export function ChatArea({ onNewChat }: ChatAreaProps) {
 
       {/* Main Chat Area */}
       <div className="flex flex-1 flex-col">
-        {/* Top Bar */}
+        {/* Top Bar - all buttons same height as ModelSelector (h-12) */}
         <div className="flex items-center gap-3 border-b-[3px] border-neo-black bg-neo-light p-4 dark:border-white/20 dark:bg-neo-dark">
+          {/* Sidebar Toggle - same height as model selector */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden flex h-10 w-10 items-center justify-center rounded-xl border-[3px] border-neo-black bg-white shadow-neo dark:border-white/30 dark:bg-neo-dark-card"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border-[3px] border-neo-black bg-white shadow-neo transition-all hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] dark:border-white/30 dark:bg-neo-dark-card dark:shadow-neo-purple lg:hidden"
           >
-            <MessageSquare className="h-5 w-5" />
+            <PanelLeft className="h-5 w-5" />
           </button>
+
+          {/* New Chat Button - same height as model selector, 1:1 square on mobile, text on desktop */}
+          <button
+            onClick={handleNewChat}
+            className="flex h-12 shrink-0 items-center justify-center gap-2 rounded-xl border-[3px] border-neo-black bg-neo-yellow px-4 shadow-neo transition-all hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px] active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] dark:bg-neo-purple dark:border-white/30 dark:shadow-neo-purple"
+            title="New Chat"
+          >
+            <Plus className="h-5 w-5" />
+            <span className="hidden text-sm font-black sm:inline">New Chat</span>
+          </button>
+
+          {/* Model Selector - flex-1 to fill remaining space */}
           <div className="flex-1">
             <ModelSelector value={model} onChange={setModel} />
           </div>
