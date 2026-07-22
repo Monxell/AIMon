@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 60 100% 97%;
+    --foreground: 0 0% 6%;
+    --card: 54 100% 88%;
+    --card-foreground: 0 0% 6%;
+    --primary: 48 96% 53%;
+    --primary-foreground: 0 0% 6%;
+    --secondary: 60 100% 90%;
+    --secondary-foreground: 0 0% 6%;
+    --muted: 60 30% 90%;
+    --muted-foreground: 0 0% 30%;
+    --accent: 48 96% 53%;
+    --accent-foreground: 0 0% 6%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 6%;
+    --input: 0 0% 6%;
+    --ring: 48 96% 53%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 240 30% 10%;
+    --foreground: 0 0% 98%;
+    --card: 240 30% 14%;
+    --card-foreground: 0 0% 98%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 30% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 20% 20%;
+    --muted-foreground: 240 10% 70%;
+    --accent: 263 70% 50%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
+    --ring: 263 70% 50%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .neo-card {
+    @apply border-[3px] border-neo-black rounded-neo shadow-neo transition-all duration-150;
+  }
+
+  .neo-card-dark {
+    @apply border-[3px] border-white/20 rounded-neo shadow-neo-purple transition-all duration-150;
+  }
+
+  .neo-button {
+    @apply border-[3px] border-neo-black rounded-xl shadow-neo font-bold px-6 py-3 transition-all duration-150 active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px];
+  }
+
+  .neo-button-dark {
+    @apply border-[3px] border-white/30 rounded-xl shadow-neo-purple font-bold px-6 py-3 transition-all duration-150 active:shadow-neo-active active:translate-x-[4px] active:translate-y-[4px] hover:shadow-neo-hover hover:translate-x-[2px] hover:translate-y-[2px];
+  }
+
+  .neo-input {
+    @apply border-[3px] border-neo-black rounded-xl px-4 py-3 outline-none focus:ring-0 focus:border-neo-black bg-white;
+  }
+
+  .neo-input-dark {
+    @apply border-[3px] border-white/30 rounded-xl px-4 py-3 outline-none focus:ring-0 focus:border-white/50 bg-neo-dark-card text-white;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
