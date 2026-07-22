@@ -1,45 +1,91 @@
 import { createContext, useContext, useState, ReactNode } from "react"
 
-export interface ChatItem {
+export interface Message {
+  role: "user" | "assistant"
+  content: string
+  model?: string
+}
+
+export interface Conversation {
   id: string
-  prompt: string
-  response: string
+  title: string
+  messages: Message[]
   model: string
   timestamp: number
 }
 
 interface HistoryContextType {
-  history: ChatItem[]
-  addChat: (item: ChatItem) => void
-  clearHistory: () => void
+  conversations: Conversation[]
+  activeId: string | null
+  addConversation: (conv: Conversation) => void
+  updateConversation: (id: string, messages: Message[], model: string) => void
+  deleteConversation: (id: string) => void
+  setActiveId: (id: string | null) => void
+  clearAll: () => void
 }
 
 const HistoryContext = createContext<HistoryContextType | undefined>(undefined)
 
 export function HistoryProvider({ children }: { children: ReactNode }) {
-  const [history, setHistory] = useState<ChatItem[]>(() => {
+  const [conversations, setConversations] = useState<Conversation[]>(() => {
     if (typeof window !== "undefined") {
-      const saved = localStorage.getItem("chat-history")
+      const saved = localStorage.getItem("ai-conversations")
       return saved ? JSON.parse(saved) : []
     }
     return []
   })
+  const [activeId, setActiveId] = useState<string | null>(null)
 
-  const addChat = (item: ChatItem) => {
-    setHistory((prev) => {
-      const next = [item, ...prev]
-      localStorage.setItem("chat-history", JSON.stringify(next))
+  const saveToStorage = (next: Conversation[]) => {
+    localStorage.setItem("ai-conversations", JSON.stringify(next))
+  }
+
+  const addConversation = (conv: Conversation) => {
+    setConversations((prev) => {
+      const next = [conv, ...prev]
+      saveToStorage(next)
+      return next
+    })
+    setActiveId(conv.id)
+  }
+
+  const updateConversation = (id: string, messages: Message[], model: string) => {
+    setConversations((prev) => {
+      const next = prev.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              messages,
+              model,
+              title: messages[0]?.content.slice(0, 40) || c.title,
+              timestamp: Date.now(),
+            }
+          : c
+      )
+      saveToStorage(next)
       return next
     })
   }
 
-  const clearHistory = () => {
-    setHistory([])
-    localStorage.removeItem("chat-history")
+  const deleteConversation = (id: string) => {
+    setConversations((prev) => {
+      const next = prev.filter((c) => c.id !== id)
+      saveToStorage(next)
+      return next
+    })
+    if (activeId === id) setActiveId(null)
+  }
+
+  const clearAll = () => {
+    setConversations([])
+    localStorage.removeItem("ai-conversations")
+    setActiveId(null)
   }
 
   return (
-    <HistoryContext.Provider value={{ history, addChat, clearHistory }}>
+    <HistoryContext.Provider
+      value={{ conversations, activeId, addConversation, updateConversation, deleteConversation, setActiveId, clearAll }}
+    >
       {children}
     </HistoryContext.Provider>
   )

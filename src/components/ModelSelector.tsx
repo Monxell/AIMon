@@ -66,7 +66,7 @@ export function ModelSelector({ value, onChange }: ModelSelectorProps) {
         )}
       >
         <div className="flex flex-col">
-          <span className="text-sm font-black">{selected?.name || "Pilih Model"}</span>
+          <span className="text-sm font-black">{selected?.name || "Select Model"}</span>
           <span className="text-xs opacity-70">{selected?.provider || ""}</span>
         </div>
         <ChevronDown className={cn("h-5 w-5 transition-transform", open && "rotate-180")} />
