@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { Send, Trash2, MessageSquare, X, Clock, PanelLeftClose, PanelLeft, Plus } from "lucide-react"
+import { Send, Trash2, MessageSquare, Clock, PanelLeftClose, PanelLeft, Plus } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { ModelSelector } from "./ModelSelector"
